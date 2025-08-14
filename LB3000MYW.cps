@@ -2743,6 +2743,8 @@ function onLinear(_x, _y, _z, feed) {
     var threadsPerInch = 1.0 / threadPitch; // per mm for metric
     var startXYZ = getCurrentPosition();
     var deltaX = spatialFormat.getResultingValue(_x - startXYZ.x);
+    // Force X and Z output on G31 lines
+    forceXYZ();
     writeBlock(
       gMotionModal.format(31),
       xOutput.format(_x),
@@ -4466,6 +4468,11 @@ function onSectionEnd() {
     currentSection.partCatcher
   ) {
     engagePartCatcher(false);
+  }
+
+  // Add tool call without offset to cancel tool compensation
+  if (!isLastSection()) {
+    writeBlock(formatTool(tool, true));
   }
 
   if (
